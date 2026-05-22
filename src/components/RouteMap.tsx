@@ -1,10 +1,22 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import type { Airport } from '../types/airport';
 
 const GREAT_CIRCLE_STEPS = 80;
+const MOBILE_MEDIA_QUERY = '(max-width: 767px)';
+
+const subscribeToMobileViewport = (onStoreChange: () => void) => {
+  const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
+  mediaQuery.addEventListener('change', onStoreChange);
+  return () => mediaQuery.removeEventListener('change', onStoreChange);
+};
+
+const getMobileViewportSnapshot = () => window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+
+const useIsMobileViewport = () =>
+  useSyncExternalStore(subscribeToMobileViewport, getMobileViewportSnapshot, () => false);
 
 const interpolateGreatCircle = (
   lat1: number,
@@ -95,7 +107,7 @@ const RouteMap = ({ from, to, className }: RouteMapProps) => {
 
   const center: [number, number] = [(from.lat + to.lat) / 2, (from.lng + to.lng) / 2];
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const isMobile = useIsMobileViewport();
   const lineWeight = isMobile ? 6 : 2.5;
   const markerPx = isMobile ? 20 : 14;
 
