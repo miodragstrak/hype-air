@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import AirportSearch from './components/AirportSearch';
 import RouteVisualizer from './components/RouteVisualizer';
 import WorldMapPanel from './components/WorldMapPanel';
-import { calculateHaversineDistance, estimateFlightDurationHours } from './utils/haversine';
+import { calculateHaversineDistance } from './utils/haversine';
 import { loadAirports } from './utils/loadAirports';
 import type { Airport } from './types/airport';
 
@@ -46,8 +46,6 @@ const App = () => {
     return calculateHaversineDistance(fromAirport.lat, fromAirport.lng, toAirport.lat, toAirport.lng);
   }, [fromAirport, toAirport]);
 
-  const durationHours = useMemo(() => estimateFlightDurationHours(distanceKm), [distanceKm]);
-
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-x-hidden bg-route-glow px-4 py-6 sm:px-6 sm:py-12">
       <div className="pointer-events-none absolute inset-0 opacity-40 [background:linear-gradient(120deg,transparent_0%,rgba(200,155,60,0.08)_35%,transparent_70%)]" />
@@ -65,7 +63,7 @@ const App = () => {
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-zinc-300 sm:text-base">
             Select your departure and destination airports to preview great-circle distance and
-            estimated journey time.
+            aircraft operating profile telemetry.
           </p>
           <p className="mt-3 text-xs tracking-[0.18em] text-zinc-400 uppercase">
             Airports loaded: {airports.length.toLocaleString()}
@@ -112,7 +110,6 @@ const App = () => {
             fromCode={fromAirport?.iata ?? '---'}
             toCode={toAirport?.iata ?? '---'}
             distanceKm={distanceKm}
-            durationHours={durationHours}
           />
         </div>
 
